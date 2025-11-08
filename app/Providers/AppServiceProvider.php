@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\UploadRepository;
 use App\Repositories\UploadRepositoryInterface;
+use App\Repositories\ProductRepository;
+use App\Repositories\ProductRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,5 +24,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->app->bind(UploadRepositoryInterface::class, UploadRepository::class);
+        $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
     }
 }
