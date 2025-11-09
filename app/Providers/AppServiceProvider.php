@@ -7,6 +7,8 @@ use App\Repositories\UploadRepository;
 use App\Repositories\UploadRepositoryInterface;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductRepositoryInterface;
+use App\Services\ImportService;
+use App\Services\ImportServiceInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +27,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(UploadRepositoryInterface::class, UploadRepository::class);
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
+        $this->app->bind(ImportServiceInterface::class, ImportService::class);
     }
 }
