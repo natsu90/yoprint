@@ -32,6 +32,7 @@ class Upload extends BaseModel
      */
     protected $fillable = [
         'filename',
+        'filepath',
         'status'
     ];
 

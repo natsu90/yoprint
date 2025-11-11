@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Upload;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Upload>
@@ -25,7 +26,8 @@ class UploadFactory extends Factory
     public function definition(): array
     {
         return [
-            'filename' => fake()->slug() .'.csv'
+            'filename' => fake()->slug(2) .'.csv',
+            'filepath' => fake()->md5() .'.csv'
         ];
     }
 }

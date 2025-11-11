@@ -35,9 +35,9 @@ class ImportServiceTest extends TestCase
 
         // put file content
         $content = file_get_contents(base_path('tests/data/yoprint_test_updated.csv'));
-        $filePath = Storage::disk('local')->url('uploads/'. $upload->filename);
-        Storage::disk('local')->put($filePath, $content);
-        Storage::disk('local')->assertExists($filePath);
+        $filePath = $upload->filepath;
+        Storage::put($filePath, $content);
+        Storage::assertExists($filePath);
 
         $this->service->process($upload);
 
@@ -49,8 +49,8 @@ class ImportServiceTest extends TestCase
         ]);
 
         // delete file after test
-        Storage::disk('local')->delete($filePath);
-        Storage::disk('local')->assertMissing($filePath);
+        Storage::delete($filePath);
+        Storage::assertMissing($filePath);
     }
 
     public function testProcessDuplicate()
@@ -61,13 +61,13 @@ class ImportServiceTest extends TestCase
 
         // put file content
         $content1 = file_get_contents(base_path('tests/data/yoprint_test_updated.csv'));
-        $filePath1 = Storage::disk('local')->url('uploads/'. $upload1->filename);
-        Storage::disk('local')->put($filePath1, $content1);
+        $filePath1 = $upload1->filepath;
+        Storage::put($filePath1, $content1);
 
         $newDescription = md5(time());
         $content2 = "UNIQUE_KEY,PRODUCT_TITLE\n62822,". $newDescription;
-        $filePath2 = Storage::disk('local')->url('uploads/'. $upload2->filename);
-        Storage::disk('local')->put($filePath2, $content2);
+        $filePath2 = $upload2->filepath;
+        Storage::put($filePath2, $content2);
 
         // process Uploads
         $this->service->process($upload1);
@@ -90,9 +90,9 @@ class ImportServiceTest extends TestCase
         ]);
 
         // delete file after test
-        Storage::disk('local')->delete($filePath1);
-        Storage::disk('local')->delete($filePath2);
-        Storage::disk('local')->assertMissing($filePath1);
-        Storage::disk('local')->assertMissing($filePath2);
+        Storage::delete($filePath1);
+        Storage::delete($filePath2);
+        Storage::assertMissing($filePath1);
+        Storage::assertMissing($filePath2);
     }
 }
