@@ -6,6 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Queue;
+use App\Jobs\ProcessUpload;
 
 class HomeControllerTest extends TestCase
 {
@@ -14,6 +16,8 @@ class HomeControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        Queue::fake();
     }
 
     public function testUpload()
@@ -24,6 +28,8 @@ class HomeControllerTest extends TestCase
         $response = $this->post('/upload', [
             'file' => $file
         ]);
+
+        Queue::assertPushed(ProcessUpload::class);
 
         $response->assertStatus(200)
             ->assertJsonStructure([

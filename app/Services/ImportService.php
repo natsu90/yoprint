@@ -7,6 +7,7 @@ use App\Models\Upload;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\UploadRepositoryInterface;
+use App\Jobs\ProcessUpload;
 
 class ImportService implements ImportServiceInterface
 {
@@ -31,7 +32,7 @@ class ImportService implements ImportServiceInterface
             'filepath' => $filePath
         ]);
 
-        $this->process($upload);
+        ProcessUpload::dispatch($upload);
 
         return $upload;
     }
