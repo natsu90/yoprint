@@ -6,8 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Queue;
-use App\Jobs\ProcessUpload;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Upload;
 
 class HomeControllerTest extends TestCase
 {
@@ -17,7 +17,7 @@ class HomeControllerTest extends TestCase
     {
         parent::setUp();
 
-        Queue::fake();
+        Excel::fake();
     }
 
     public function testUpload()
@@ -29,15 +29,20 @@ class HomeControllerTest extends TestCase
             'file' => $file
         ]);
 
-        Queue::assertPushed(ProcessUpload::class);
-
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'data' => [
+                    'id',
                     'filename',
                     'status',
-                    'uploaded_at'
+                    'created_at'
                 ]
             ]);
+
+        $data = json_decode($response->getContent())->data;
+        $uploadId = $data->id;
+        $upload = Upload::find($uploadId);
+
+        Excel::assertQueued($upload->filepath);
     }
 }

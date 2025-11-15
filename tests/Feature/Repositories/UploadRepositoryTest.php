@@ -25,15 +25,19 @@ class UploadRepositoryTest extends TestCase
 
     public function test_create()
     {
+        $fileName = fake()->slug(2) .'.csv';
+        $filePath = fake()->md5() .'.csv';
+
         $upload = $this->repository->create([
-            'filename' => fake()->slug() .'.csv',
+            'filename' => $fileName,
+            'filepath' => $filePath,
             'status' => fake()->randomElement(Upload::STATUSES)
         ]);
 
         $this->assertInstanceOf(Upload::class, $upload);
         $this->assertDatabaseHas(Upload::getTableName(), [
-            'id' => $upload->getKey(),
-            'filename' => $upload->filename
+            'filename' => $upload->filename,
+            'filepath' => $upload->filepath
         ]);
 
     }

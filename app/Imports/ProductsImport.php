@@ -12,11 +12,15 @@ use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 use Maatwebsite\Excel\Events\BeforeImport;
 use Maatwebsite\Excel\Events\AfterImport;
 use Maatwebsite\Excel\Events\ImportFailed;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\RemembersRowNumber;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ProductsImport implements ToModel, WithUpserts, 
-    WithHeadingRow, WithEvents
+class ProductsImport implements ToModel, WithUpserts, ShouldQueue,
+    WithHeadingRow, WithEvents, WithChunkReading, WithBatchInserts
 {
-    use RegistersEventListeners;
+    use RegistersEventListeners, RemembersRowNumber;
 
     public function __construct(Upload $upload)
     {
@@ -69,6 +73,16 @@ class ProductsImport implements ToModel, WithUpserts,
     public function uniqueBy()
     {
         return 'id';
+    }
+
+    public function chunkSize(): int
+    {
+        return 1000;
+    }
+
+    public function batchSize(): int
+    {
+        return 1000;
     }
 
     public function beforeImport(BeforeImport $event)

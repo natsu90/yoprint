@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('uploads', function (Blueprint $table) {
-            $table->string('filepath')->after('filename');
+        Schema::table('products', function (Blueprint $table) {
+            $table->string('color')->nullable()->change();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-       Schema::table('uploads', function (Blueprint $table) {
-            $table->dropColumn('filepath');
+        Schema::table('products', function (Blueprint $table) {
+            $table->string('color', length: 30)->nullable()->change();
         });
     }
 };
