@@ -61,7 +61,7 @@
 <template>
 <v-app>
     <v-main>
-        <v-app-bar title="YoPrint File Upload"></v-app-bar>
+        <v-app-bar title="YoPrint File Import"></v-app-bar>
         <v-container>
             <form @submit.prevent="submit">
                 <v-file-input

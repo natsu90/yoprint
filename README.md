@@ -1,43 +1,59 @@
 
-## Installation (using Sail without pre-installed PHP)
+# YoPrint File Import
+
+![UI screenshot](/screenshot.png "UI screenshot")
+
+## Prerequisites
+* PHP 8.4
+* NPM 11.6
+* MySQL 8.0
+* Redis
+
+### Laravel Sail
+
+If you have Docker installed, you can run following command,
+```
+docker compose up
+```
+
+## Installation
 
 ```
+# Setup environment variables
 cp .env.example .env
+
+# Install PHP libraries & dependencies
+composer install
+
+# Install NPM libraries
+npm install
+
+# Generate app key
+php artisan key:generate
+
+# Run DB migration
+php artisan migrate
 ```
+
+
+## Setup
+Start each process in its own terminal
+
 ```
-docker run --rm \
- -u "$(id -u):$(id -g)" \
- -v "$(pwd):/var/www/html" \
- -w /var/www/html \
- laravelsail/php84-composer:latest \
- composer install
+# Laravel Horizon
+php artisan horizon
+
+# Server-Sent Events regular ping
+php artisan sse:ping --interval=30
+
+# Frontend
+npm run dev
+
 ```
+
+## Test
 ```
-docker run --rm \     
- -u "$(id -u):$(id -g)" \
- -v "$(pwd):/var/www/html" \
- -w /var/www/html \
- laravelsail/php84-composer:latest \
- php artisan key:generate
-```
-```
-docker run --rm \     
- -u "$(id -u):$(id -g)" \
- -v "$(pwd):/var/www/html" \
- -w /var/www/html \
- laravelsail/php84-composer:latest \
- php artisan sail:install
-```
-```
-docker run --rm \     
- -u "$(id -u):$(id -g)" \
- -v "$(pwd):/var/www/html" \
- -w /var/www/html \
- laravelsail/php84-composer:latest \
- php artisan sail:add redis
-```
-```
- ./vendor/bin/sail up
+php artisan test
 ```
 
 ## License
