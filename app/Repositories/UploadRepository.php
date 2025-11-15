@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Upload;
+use Illuminate\Support\Collection;
 
 class UploadRepository implements UploadRepositoryInterface
 {
@@ -19,5 +20,10 @@ class UploadRepository implements UploadRepositoryInterface
         $upload->save();
 
         return $upload;
+    }
+
+    public function getAll(): Collection
+    {
+        return Upload::orderBy('created_at', 'desc')->get();
     }
 }

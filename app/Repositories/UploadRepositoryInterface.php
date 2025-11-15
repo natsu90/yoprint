@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Upload;
+use Illuminate\Support\Collection;
 
 interface UploadRepositoryInterface
 {
@@ -22,4 +23,9 @@ interface UploadRepositoryInterface
      * @return Upload
      */
     public function updateStatus(int $uploadId, string $status): Upload;
+
+    /**
+     * Get all Upload records
+     */
+    public function getAll(): Collection;
 }

@@ -11,9 +11,10 @@ class UploadTransformer extends TransformerAbstract
     public function transform(Upload $upload)
     {
         return [
+            'id' => $upload->id,
             'filename' => $upload->filename,
             'status' => $upload->status,
-            'uploaded_at' => $upload->created_at
+            'created_at' => $upload->created_at
         ];
     }
 }

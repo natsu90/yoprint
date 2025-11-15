@@ -49,7 +49,7 @@ return [
     |
     */
     'ping' => [
-        'enable' => true,
+        'enable' => false,
         'frequency' => 30,
         'eager_env' => 'local', // null or array
     ],

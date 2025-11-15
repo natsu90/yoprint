@@ -4,4 +4,5 @@ import { WaveConnector } from 'laravel-wave';
 
 window.Echo = new Echo({
     broadcaster: WaveConnector,
+    debug: true
 });
