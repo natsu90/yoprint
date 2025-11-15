@@ -16,6 +16,7 @@ use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\RemembersRowNumber;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use ForceUTF8\Encoding;
 
 class ProductsImport implements ToModel, WithUpserts, ShouldQueue,
     WithHeadingRow, WithEvents, WithChunkReading, WithBatchInserts
@@ -49,7 +50,7 @@ class ProductsImport implements ToModel, WithUpserts, ShouldQueue,
         {
             if (isset($dbColumnMap[$header])) {
                 $dbColumn = $dbColumnMap[$header];
-                $dataToUpsert[$dbColumn] = $value;
+                $dataToUpsert[$dbColumn] = Encoding::fixUTF8($value);
             }
         }
 
