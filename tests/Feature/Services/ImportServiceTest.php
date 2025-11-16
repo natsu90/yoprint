@@ -8,10 +8,17 @@ use App\Services\ImportServiceInterface;
 use App\Models\Upload;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Event;
+use App\Events\UploadUpdated;
 
 class ImportServiceTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * Test File Path
+     */
+    const PRODUCT_FILE_PATH = 'tests/data/yoprint_test_updated.csv';
 
     /**
      * Product ID to be tested
@@ -43,6 +50,9 @@ class ImportServiceTest extends TestCase
         parent::setUp();
 
         $this->service = $this->app->make(ImportServiceInterface::class);
+
+        // https://github.com/laravel/framework/issues/18923#issuecomment-1470106626
+        Event::fake(UploadUpdated::class);
     }
 
     public function testProcess()
@@ -58,7 +68,7 @@ class ImportServiceTest extends TestCase
         ]);
 
         // put file content
-        $content = file_get_contents(base_path('tests/data/yoprint_test_updated.csv'));
+        $content = file_get_contents(base_path(self::PRODUCT_FILE_PATH));
         $filePath = $upload->filepath;
         Storage::put($filePath, $content);
         Storage::assertExists($filePath);
@@ -78,6 +88,16 @@ class ImportServiceTest extends TestCase
             'style' => self::PRODUCT_STYLE_TEST
         ]);
 
+        Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload) {
+            return $event->upload->id === $upload->id 
+                && $event->upload->status === Upload::STATUS_PROCESSING;
+        }, 1);
+
+        Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload) {
+            return $event->upload->id === $upload->id 
+                && $event->upload->status === Upload::STATUS_COMPLETED;
+        }, 1);
+
         // delete file after test
         Storage::delete($filePath);
         Storage::assertMissing($filePath);
@@ -90,7 +110,7 @@ class ImportServiceTest extends TestCase
         $upload2 = Upload::factory()->create();
 
         // put file content
-        $content1 = file_get_contents(base_path('tests/data/yoprint_test_updated.csv'));
+        $content1 = file_get_contents(base_path(self::PRODUCT_FILE_PATH));
         $filePath1 = $upload1->filepath;
         Storage::put($filePath1, $content1);
 
@@ -122,6 +142,26 @@ class ImportServiceTest extends TestCase
             'id' => $upload2->getKey(),
             'status' => Upload::STATUS_COMPLETED
         ]);
+
+        Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload1) {
+            return $event->upload->id === $upload1->id 
+                && $event->upload->status === Upload::STATUS_PROCESSING;
+        }, 1);
+
+        Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload1) {
+            return $event->upload->id === $upload1->id 
+                && $event->upload->status === Upload::STATUS_COMPLETED;
+        }, 1);
+
+        Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload2) {
+            return $event->upload->id === $upload2->id 
+                && $event->upload->status === Upload::STATUS_PROCESSING;
+        }, 1);
+
+        Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload2) {
+            return $event->upload->id === $upload2->id 
+                && $event->upload->status === Upload::STATUS_COMPLETED;
+        }, 1);
 
         // delete file after test
         Storage::delete($filePath1);
