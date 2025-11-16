@@ -45,7 +45,9 @@ class UploadRepositoryTest extends TestCase
 
     public function test_get_all()
     {
-        $uploads = Upload::factory(3)->create();
+        Upload::factory(3)->create();
+
+        $uploads = $this->repository->getAll();
 
         $this->assertInstanceOf(Collection::class, $uploads);
 
