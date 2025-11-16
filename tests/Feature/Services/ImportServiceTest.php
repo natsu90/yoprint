@@ -14,6 +14,26 @@ class ImportServiceTest extends TestCase
     use RefreshDatabase;
 
     /**
+     * Product ID to be tested
+     */
+    const PRODUCT_ID_TEST = 62822;
+
+    /**
+     * Expected Product Title
+     */
+    const PRODUCT_COLOR_TEST = 'White';
+
+    /**
+     * Expected Product Style
+     */
+    const PRODUCT_STYLE_TEST = '054X';
+
+    /**
+     * Expected Total Products
+     */
+    const PRODUCT_TOTAL_TEST = 17;
+
+    /**
      * @var ImportServiceInterface
      */
     private $service;
@@ -33,6 +53,10 @@ class ImportServiceTest extends TestCase
         // confirm Pending status
         $this->assertEquals($upload->status, Upload::STATUS_PENDING);
 
+        $this->assertDatabaseMissing(Product::getTableName(), [
+            'id' => self::PRODUCT_ID_TEST
+        ]);
+
         // put file content
         $content = file_get_contents(base_path('tests/data/yoprint_test_updated.csv'));
         $filePath = $upload->filepath;
@@ -41,11 +65,17 @@ class ImportServiceTest extends TestCase
 
         $this->service->process($upload);
 
-        $this->assertDatabaseCount(Product::getTableName(), 17);
+        $this->assertDatabaseCount(Product::getTableName(), self::PRODUCT_TOTAL_TEST);
 
         $this->assertDatabaseHas(Upload::getTableName(), [
             'id' => $upload->getKey(),
             'status' => Upload::STATUS_COMPLETED
+        ]);
+
+        $this->assertDatabaseHas(Product::getTableName(), [
+            'id' => self::PRODUCT_ID_TEST,
+            'color' => self::PRODUCT_COLOR_TEST,
+            'style' => self::PRODUCT_STYLE_TEST
         ]);
 
         // delete file after test
@@ -64,8 +94,8 @@ class ImportServiceTest extends TestCase
         $filePath1 = $upload1->filepath;
         Storage::put($filePath1, $content1);
 
-        $newDescription = md5(time());
-        $content2 = "UNIQUE_KEY,PRODUCT_TITLE\n62822,". $newDescription;
+        $newTitle = md5(time());
+        $content2 = "UNIQUE_KEY,PRODUCT_TITLE\n". self::PRODUCT_ID_TEST .",". $newTitle;
         $filePath2 = $upload2->filepath;
         Storage::put($filePath2, $content2);
 
@@ -73,11 +103,15 @@ class ImportServiceTest extends TestCase
         $this->service->process($upload1);
         $this->service->process($upload2);
 
-        $this->assertDatabaseCount(Product::getTableName(), 17);
+        // confirm that products total is remaining the same even when processed twice
+        $this->assertDatabaseCount(Product::getTableName(), self::PRODUCT_TOTAL_TEST);
+
+        // confirm that only title was updated,
         $this->assertDatabaseHas(Product::getTableName(), [
-            'id' => 62822,
-            'title' => $newDescription,
-            'color' => 'White' // confirm that old value is not updated
+            'id' => self::PRODUCT_ID_TEST,
+            'title' => $newTitle,
+            'color' => self::PRODUCT_COLOR_TEST,
+            'style' => self::PRODUCT_STYLE_TEST
         ]);
 
         $this->assertDatabaseHas(Upload::getTableName(), [
