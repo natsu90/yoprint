@@ -55,17 +55,6 @@ class ProductsImport implements ToModel, WithUpserts, ShouldQueue,
         }
 
         return new Product($dataToUpsert);
-
-        // return new Product([
-        //     'id' => $row['unique_key'],
-        //     'title' => $row['product_title'] ?? null,
-        //     'description' => $row['product_description'] ?? null,
-        //     'style' => $row['style'] ?? null,
-        //     'mainframe_color' => $row['sanmar_mainframe_color'] ?? null,
-        //     'size' => $row['size'] ?? null,
-        //     'color' => $row['color_name'] ?? null,
-        //     'price' => $row['piece_price'] ?? null
-        // ]);
     }
 
     /**
