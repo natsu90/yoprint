@@ -5,8 +5,6 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\UploadRepository;
 use App\Repositories\UploadRepositoryInterface;
-use App\Repositories\ProductRepository;
-use App\Repositories\ProductRepositoryInterface;
 use App\Services\ImportService;
 use App\Services\ImportServiceInterface;
 use App\Models\Upload;
@@ -28,7 +26,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->app->bind(UploadRepositoryInterface::class, UploadRepository::class);
-        $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->bind(ImportServiceInterface::class, ImportService::class);
 
         Upload::observe(UploadObserver::class);

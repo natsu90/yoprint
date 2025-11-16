@@ -16,15 +16,6 @@ interface UploadRepositoryInterface
     public function create(array $params): Upload;
 
     /**
-     * Update status of an Upload record
-     * 
-     * @param int $uploadId
-     * @param string $status
-     * @return Upload
-     */
-    public function updateStatus(int $uploadId, string $status): Upload;
-
-    /**
      * Get all Upload records
      */
     public function getAll(): Collection;

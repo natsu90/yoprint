@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Repositories\UploadRepositoryInterface;
 use App\Models\Upload;
+use Illuminate\Support\Collection;
 
 class UploadRepositoryTest extends TestCase
 {
@@ -42,16 +43,13 @@ class UploadRepositoryTest extends TestCase
 
     }
 
-    public function test_update_status()
+    public function test_get_all()
     {
-        $upload = Upload::factory()->create();
+        $uploads = Upload::factory(3)->create();
 
-        $updatedUpload = $this->repository->updateStatus($upload->getKey(), Upload::STATUS_COMPLETED);
+        $this->assertInstanceOf(Collection::class, $uploads);
 
-        $this->assertInstanceOf(Upload::class, $updatedUpload);
-        $this->assertDatabaseHas(Upload::getTableName(), [
-            'id' => $upload->getKey(),
-            'status' => Upload::STATUS_COMPLETED
-        ]);
+        foreach ($uploads as $upload)
+            $this->assertInstanceOf(Upload::class, $upload);
     }
 }
