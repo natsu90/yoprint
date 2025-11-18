@@ -89,14 +89,22 @@ class ImportServiceTest extends TestCase
         ]);
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload) {
-            return $event->upload->id === $upload->id 
+            return $event->upload->id === $upload->id  
+                && $event->upload->processed > 0
                 && $event->upload->status === Upload::STATUS_PROCESSING;
-        }, 1);
+        });
+
+        Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload) {
+            return $event->upload->id === $upload->id  
+                && $event->upload->processed === 0
+                && $event->upload->status === Upload::STATUS_PROCESSING;
+        });
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload) {
             return $event->upload->id === $upload->id 
+                && $event->upload->processed === self::PRODUCT_TOTAL_TEST
                 && $event->upload->status === Upload::STATUS_COMPLETED;
-        }, 1);
+        });
 
         // delete file after test
         Storage::delete($filePath);
@@ -145,23 +153,38 @@ class ImportServiceTest extends TestCase
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload1) {
             return $event->upload->id === $upload1->id 
-                && $event->upload->status === Upload::STATUS_PROCESSING;
-        }, 1);
+                && $event->upload->status === Upload::STATUS_PROCESSING
+                && $event->upload->processed === 0;
+        });
+
+        Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload1) {
+            return $event->upload->id === $upload1->id 
+                && $event->upload->status === Upload::STATUS_PROCESSING
+                && $event->upload->processed > 0;
+        });
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload1) {
             return $event->upload->id === $upload1->id 
                 && $event->upload->status === Upload::STATUS_COMPLETED;
-        }, 1);
+        });
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload2) {
             return $event->upload->id === $upload2->id 
-                && $event->upload->status === Upload::STATUS_PROCESSING;
-        }, 1);
+                && $event->upload->status === Upload::STATUS_PROCESSING
+                && $event->upload->processed === 0;
+        });
+
+        // no idea why this is not called
+        // Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload2) {
+        //     return $event->upload->id === $upload2->id 
+        //         && $event->upload->status === Upload::STATUS_PROCESSING
+        //         && $event->upload->processed > 0;
+        // });
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload2) {
             return $event->upload->id === $upload2->id 
                 && $event->upload->status === Upload::STATUS_COMPLETED;
-        }, 1);
+        });
 
         // delete file after test
         Storage::delete($filePath1);

@@ -35,6 +35,15 @@ class ProductsImport implements ToModel, WithUpserts, ShouldQueue,
     */
     public function model(array $row)
     {
+        // get current processed total rows without header row
+        $totalRows = $this->getRowNumber() - 1;
+        // update progress for each 10 rows
+        if ($totalRows % 10 === 0) {
+            $this->upload->update([
+                'processed' => $totalRows
+            ]);
+        }
+
         $dbColumnMap = [
             'unique_key' => 'id',
             'product_title' => 'title',
@@ -77,14 +86,22 @@ class ProductsImport implements ToModel, WithUpserts, ShouldQueue,
 
     public function beforeImport(BeforeImport $event)
     {
+        // get total rows excluding header row
+        $totalRows = $event->getReader()->getTotalRows()['Worksheet'] - 1;
+
         $this->upload->update([
+            'total' => $totalRows,
             'status' => Upload::STATUS_PROCESSING
         ]);
     }
 
     public function afterImport(AfterImport $event)
     {
+        // get total rows excluding header row
+        $totalRows = $event->getReader()->getTotalRows()['Worksheet'] - 1;
+
         $this->upload->update([
+            'processed' => $totalRows,
             'status' => Upload::STATUS_COMPLETED
         ]);
     }

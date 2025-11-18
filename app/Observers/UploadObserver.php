@@ -20,7 +20,7 @@ class UploadObserver
      */
     public function updated(Upload $upload): void
     {
-        if ($upload->wasChanged('status')) {
+        if ($upload->wasChanged(['status', 'processed', 'total'])) {
             UploadUpdated::dispatch($upload);
         }
     }

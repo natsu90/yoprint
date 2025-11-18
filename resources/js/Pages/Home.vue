@@ -91,6 +91,9 @@
                         <th>
                             Status
                         </th>
+                        <th>
+                            Progress
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -98,6 +101,10 @@
                         <td>{{ upload.created_at }}</td>
                         <td>{{ upload.filename }}</td>
                         <td>{{ upload.status }}</td>
+                        <td v-if="upload.processed > 0">
+                            {{ Math.floor(upload.processed / upload.total * 100) }}%
+                        </td>
+                        <td v-else>0%</td>
                     </tr>
                 </tbody>
             </v-table>

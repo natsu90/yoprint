@@ -22,6 +22,8 @@ class Upload extends BaseModel
      * @var array
      */
     protected $attributes = [
+        'processed' => 0,
+        'total' => 0,
         'status' => self::STATUS_PENDING
     ];
 
@@ -33,6 +35,8 @@ class Upload extends BaseModel
     protected $fillable = [
         'filename',
         'filepath',
+        'processed',
+        'total',
         'status'
     ];
 
