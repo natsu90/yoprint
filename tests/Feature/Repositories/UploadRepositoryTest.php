@@ -37,8 +37,8 @@ class UploadRepositoryTest extends TestCase
 
         $this->assertInstanceOf(Upload::class, $upload);
         $this->assertDatabaseHas(Upload::getTableName(), [
-            'filename' => $upload->filename,
-            'filepath' => $upload->filepath
+            'filename' => $fileName,
+            'filepath' => $filePath
         ]);
 
     }
