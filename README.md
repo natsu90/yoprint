@@ -1,6 +1,8 @@
 
 # YoPrint File Import
 
+https://www.notion.so/YoPrint-Laravel-Coding-Project-Spec-1e50db99ea52806fa1fde6e8fdf73b89
+
 ![UI screenshot](/screenshot.png "UI screenshot")
 
 ## Prerequisites
