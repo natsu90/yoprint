@@ -4,7 +4,7 @@ namespace Tests\Feature\Services;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Services\ImportServiceInterface;
+use App\Contracts\ImportServiceInterface;
 use App\Models\Upload;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;

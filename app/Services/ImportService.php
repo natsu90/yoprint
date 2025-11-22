@@ -6,7 +6,8 @@ use App\Imports\ProductsImport;
 use App\Models\Upload;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
-use App\Repositories\UploadRepositoryInterface;
+use App\Contracts\UploadRepositoryInterface;
+use App\Contracts\ImportServiceInterface;
 
 class ImportService implements ImportServiceInterface
 {

@@ -4,9 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\UploadRepository;
-use App\Repositories\UploadRepositoryInterface;
+use App\Contracts\UploadRepositoryInterface;
 use App\Services\ImportService;
-use App\Services\ImportServiceInterface;
+use App\Contracts\ImportServiceInterface;
 use App\Models\Upload;
 use App\Observers\UploadObserver;
 

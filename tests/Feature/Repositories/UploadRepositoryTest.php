@@ -4,7 +4,7 @@ namespace Tests\Feature\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Repositories\UploadRepositoryInterface;
+use App\Contracts\UploadRepositoryInterface;
 use App\Models\Upload;
 use Illuminate\Support\Collection;
 

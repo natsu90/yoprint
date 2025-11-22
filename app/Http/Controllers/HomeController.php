@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ImportServiceInterface;
+use App\Contracts\ImportServiceInterface;
 use App\Http\Requests\UploadRequest;
 use Illuminate\Http\Request;
 use App\Transformers\UploadTransformer;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use Inertia\Inertia;
-use App\Repositories\UploadRepositoryInterface;
+use App\Contracts\UploadRepositoryInterface;
 
 class HomeController extends Controller
 {

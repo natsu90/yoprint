@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Contracts;
 
 use App\Models\Upload;
 use Illuminate\Support\Collection;

@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Contracts\UploadRepositoryInterface;
 use App\Models\Upload;
 use Illuminate\Support\Collection;
 
