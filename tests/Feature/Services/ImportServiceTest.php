@@ -61,7 +61,7 @@ class ImportServiceTest extends TestCase
         $upload = Upload::factory()->create();
 
         // confirm Pending status
-        $this->assertEquals($upload->status, Upload::STATUS_PENDING);
+        $this->assertEquals($upload->status, Upload::STATUS_UPLOADING);
 
         $this->assertDatabaseMissing(Product::getTableName(), [
             'id' => self::PRODUCT_ID_TEST
@@ -107,6 +107,42 @@ class ImportServiceTest extends TestCase
         });
 
         // delete file after test
+        Storage::delete($filePath);
+        Storage::assertMissing($filePath);
+    }
+
+    public function testProcessImportFile()
+    {
+        $upload = Upload::factory()->create();
+
+        $this->assertEquals($upload->status, Upload::STATUS_UPLOADING);
+
+        $content = file_get_contents(base_path('tests/data/yoprint_test_import.csv'));
+        $filePath = $upload->filepath;
+        Storage::put($filePath, $content);
+        Storage::assertExists($filePath);
+
+        $this->service->process($upload);
+
+        $this->assertDatabaseHas(Upload::getTableName(), [
+            'id' => $upload->getKey(),
+            'status' => Upload::STATUS_COMPLETED,
+        ]);
+
+        $this->assertDatabaseHas(Product::getTableName(), [
+            'id' => 62822,
+        ]);
+
+        $this->assertDatabaseHas(Product::getTableName(), [
+            'id' => 1563841,
+        ]);
+
+        // Verify long color values (>30 chars) are stored without truncation
+        $this->assertDatabaseHas(Product::getTableName(), [
+            'id' => 780621,
+            'color' => 'Dark Grey/ Black/ Sport Fuchsia',
+        ]);
+
         Storage::delete($filePath);
         Storage::assertMissing($filePath);
     }

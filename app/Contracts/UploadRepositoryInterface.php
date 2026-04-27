@@ -19,4 +19,9 @@ interface UploadRepositoryInterface
      * Get all Upload records
      */
     public function getAll(): Collection;
+
+    /**
+     * Get the Upload record
+     */
+    public function get(int $uploadId): Upload;
 }

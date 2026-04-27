@@ -17,4 +17,9 @@ class UploadRepository implements UploadRepositoryInterface
     {
         return Upload::orderBy('created_at', 'desc')->get();
     }
+
+    public function get(int $uploadId): Upload
+    {
+        return Upload::find($uploadId);
+    }
 }

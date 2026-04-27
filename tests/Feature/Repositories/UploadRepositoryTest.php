@@ -54,4 +54,16 @@ class UploadRepositoryTest extends TestCase
         foreach ($uploads as $upload)
             $this->assertInstanceOf(Upload::class, $upload);
     }
+
+    public function test_get()
+    {
+        $newUpload = Upload::factory()->create();
+
+        $upload = $this->repository->get($newUpload->getKey());
+
+        $this->assertInstanceOf(Upload::class, $upload);
+        $this->assertEquals($upload->getKey(), $newUpload->getKey());
+        $this->assertEquals($upload->filepath, $newUpload->filepath);
+        $this->assertEquals($upload->filename, $newUpload->filename);
+    }
 }

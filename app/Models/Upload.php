@@ -24,7 +24,7 @@ class Upload extends BaseModel
     protected $attributes = [
         'processed' => 0,
         'total' => 0,
-        'status' => self::STATUS_PENDING
+        'status' => self::STATUS_UPLOADING
     ];
 
     /**
@@ -43,7 +43,7 @@ class Upload extends BaseModel
     /**
      * Status values
      */
-    const STATUS_PENDING = 'pending';
+    const STATUS_UPLOADING = 'uploading';
 
     const STATUS_PROCESSING = 'processing';
 
@@ -52,7 +52,7 @@ class Upload extends BaseModel
     const STATUS_COMPLETED = 'completed';
 
     const STATUSES = [
-        self::STATUS_PENDING,
+        self::STATUS_UPLOADING,
         self::STATUS_PROCESSING,
         self::STATUS_FAILED,
         self::STATUS_COMPLETED

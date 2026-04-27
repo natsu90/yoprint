@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UploadRequest extends FormRequest
 {
@@ -22,7 +23,9 @@ class UploadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required|file|mimes:csv'
+            'file' => ['required', 'file', Rule::when(!$this->has('append_file'), ['mimes:csv'])],
+            'append_file' => ['sometimes', 'integer', 'exists:uploads,id'],
+            'last_append' => ['sometimes', 'boolean'],
         ];
     }
 }

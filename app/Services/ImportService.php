@@ -24,15 +24,30 @@ class ImportService implements ImportServiceInterface
     public function create(array $params): Upload
     {
         $file = $params['file'];
-        $fileName = $file->getClientOriginalName();
-        $filePath = $file->store();
+        $existingUploadId = $params['append_file'] ?? null;
 
-        $upload = $this->uploads->create([
-            'filename' => $fileName,
-            'filepath' => $filePath
-        ]);
+        if ($existingUploadId) {
 
-        $this->process($upload);
+            $upload = $this->uploads->get($existingUploadId);
+            Storage::append($upload->filepath, $file->get(), '');
+
+        } else {
+
+            $fileName = $file->getClientOriginalName();
+            $filePath = $file->store();
+
+            $upload = $this->uploads->create([
+                'filename' => $fileName,
+                'filepath' => $filePath
+            ]);
+        }
+
+        $lastChunk = !empty($params['last_append']);
+
+        if ($lastChunk) {
+
+            $this->process($upload);
+        }
 
         return $upload;
     }

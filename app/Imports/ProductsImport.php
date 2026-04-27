@@ -52,11 +52,12 @@ class ProductsImport implements ToModel, WithUpserts, ShouldQueue,
             'sanmar_mainframe_color' => 'mainframe_color',
             'size' => 'size',
             'color_name' => 'color',
-            'piece_price' => 'price'
+            'piece_price' => 'price',
         ];
 
-        foreach ($row as $header => $value)
-        {
+        $dataToUpsert = [];
+
+        foreach ($row as $header => $value) {
             if (isset($dbColumnMap[$header])) {
                 $dbColumn = $dbColumnMap[$header];
                 $dataToUpsert[$dbColumn] = Encoding::fixUTF8($value);
@@ -97,13 +98,15 @@ class ProductsImport implements ToModel, WithUpserts, ShouldQueue,
 
     public function afterImport(AfterImport $event)
     {
-        // get total rows excluding header row
         $totalRows = $event->getReader()->getTotalRows()['Worksheet'] - 1;
 
-        $this->upload->update([
-            'processed' => $totalRows,
-            'status' => Upload::STATUS_COMPLETED
-        ]);
+        $this->upload->update(['processed' => $totalRows]);
+
+        if ($this->upload->processed < $this->upload->total) {
+            return;
+        }
+
+        $this->upload->update(['status' => Upload::STATUS_COMPLETED]);
     }
 
     public function importFailed(ImportFailed $event)
