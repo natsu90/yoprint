@@ -29,6 +29,9 @@ jobs:
           echo "WWWUSER=$(id -u)" >> $GITHUB_ENV
           echo "MYSQL_EXTRA_OPTIONS=" >> $GITHUB_ENV
 
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts --ignore-platform-reqs
+
       - name: Run docker compose
         uses: hoverkraft-tech/compose-action@3846bcd61da338e9eaaf83e7ed0234a12b099b72 # v2.4.1
         with:
@@ -39,11 +42,8 @@ jobs:
             redis
           up-flags: "--build --wait"
 
-      - name: Install Composer dependencies
-        run: docker compose exec composer install --prefer-dist --no-interaction --no-progress
-
       - name: Generate app key
-        run: docker compose exec php artisan key:generate
+        run: docker compose exec laravel.test php artisan key:generate
 
       - name: Execute tests
-        run: docker compose exec php artisan test
+        run: docker compose exec laravel.test php artisan test
