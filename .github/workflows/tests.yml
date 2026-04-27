@@ -23,6 +23,12 @@ jobs:
       - name: Copy environment file
         run: cp .env.example .env
 
+      - name: Set environment variables
+        run: |
+          echo "WWWGROUP=$(id -g)" >> $GITHUB_ENV
+          echo "WWWUSER=$(id -u)" >> $GITHUB_ENV
+          echo "MYSQL_EXTRA_OPTIONS=" >> $GITHUB_ENV
+
       - name: Run docker compose
         uses: hoverkraft-tech/compose-action@3846bcd61da338e9eaaf83e7ed0234a12b099b72 # v2.4.1
         with:
