@@ -16,34 +16,53 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql/mysql-server:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_ROOT_HOST: '%'
+          MYSQL_DATABASE: laravel
+          MYSQL_USER: sail
+          MYSQL_PASSWORD: password
+          MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping -ppassword" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, json, bcmath, pdo_mysql, redis, zip, pcntl, gd
+          coverage: none
+
       - name: Copy environment file
         run: cp .env.example .env
 
-      - name: Set environment variables
+      - name: Override environment for CI
         run: |
-          echo "WWWGROUP=$(id -g)" >> $GITHUB_ENV
-          echo "WWWUSER=$(id -u)" >> $GITHUB_ENV
-          echo "MYSQL_EXTRA_OPTIONS=" >> $GITHUB_ENV
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "REDIS_HOST=127.0.0.1" >> .env
 
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts --ignore-platform-reqs
-
-      - name: Run docker compose
-        uses: hoverkraft-tech/compose-action@3846bcd61da338e9eaaf83e7ed0234a12b099b72 # v2.4.1
-        with:
-          compose-file: "./compose.yaml"
-          services: |
-            laravel.test
-            mysql
-            redis
-          up-flags: "--build --wait"
+        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
 
       - name: Generate app key
-        run: docker compose exec laravel.test php artisan key:generate
+        run: php artisan key:generate
+
+      - name: Run database migrations
+        run: php artisan migrate --force
 
       - name: Execute tests
-        run: docker compose exec laravel.test php artisan test
+        run: php artisan test
