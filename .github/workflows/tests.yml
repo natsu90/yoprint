@@ -55,8 +55,16 @@ jobs:
           echo "DB_HOST=127.0.0.1" >> .env
           echo "REDIS_HOST=127.0.0.1" >> .env
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
+
+      - name: Install NPM dependencies and build assets
+        run: npm ci && npm run build
 
       - name: Generate app key
         run: php artisan key:generate
