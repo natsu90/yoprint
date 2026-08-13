@@ -2,14 +2,12 @@
 
 namespace App\Services;
 
-use App\Imports\ProductsImport;
-use App\Models\Upload;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage;
-use App\Contracts\UploadRepositoryInterface;
 use App\Contracts\ImportServiceInterface;
+use App\Contracts\UploadRepositoryInterface;
+use App\Models\Upload;
+use Illuminate\Support\Facades\Storage;
 
-class ImportService implements ImportServiceInterface
+abstract class AbstractImportService implements ImportServiceInterface
 {
     /**
      * @var UploadRepositoryInterface
@@ -38,11 +36,11 @@ class ImportService implements ImportServiceInterface
 
             $upload = $this->uploads->create([
                 'filename' => $fileName,
-                'filepath' => $filePath
+                'filepath' => $filePath,
             ]);
         }
 
-        $lastChunk = !empty($params['last_append']);
+        $lastChunk = ! empty($params['last_append']);
 
         if ($lastChunk) {
 
@@ -50,10 +48,5 @@ class ImportService implements ImportServiceInterface
         }
 
         return $upload;
-    }
-
-    public function process(Upload $upload)
-    {
-        Excel::import(new ProductsImport($upload), $upload->filepath);
     }
 }

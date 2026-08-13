@@ -2,29 +2,29 @@
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
-use App\Services\ImportService;
 use App\Contracts\UploadRepositoryInterface;
-use App\Imports\ProductsImport;
 use App\Models\Upload;
+use App\Services\ExcelImportService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use Tests\TestCase;
 
 class ImportServiceTest extends TestCase
 {
     private $repositoryMock;
-    private ImportService $service;
 
-    public function setUp(): void
+    private ExcelImportService $service;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->repositoryMock = $this->mock(UploadRepositoryInterface::class);
-        $this->service = new ImportService($this->repositoryMock);
+        $this->service = new ExcelImportService($this->repositoryMock);
     }
 
-    public function testCreateNewUpload(): void
+    public function test_create_new_upload(): void
     {
         Storage::fake();
         Excel::shouldReceive('import')->once();
@@ -41,7 +41,7 @@ class ImportServiceTest extends TestCase
         $this->assertInstanceOf(Upload::class, $result);
     }
 
-    public function testCreateNewUploadFirstChunkDoesNotProcess(): void
+    public function test_create_new_upload_first_chunk_does_not_process(): void
     {
         Storage::fake();
         Excel::shouldReceive('import')->never();
@@ -58,7 +58,7 @@ class ImportServiceTest extends TestCase
         $this->assertInstanceOf(Upload::class, $result);
     }
 
-    public function testCreateAppendsToExistingUpload(): void
+    public function test_create_appends_to_existing_upload(): void
     {
         Storage::fake();
         Excel::shouldReceive('import')->never();
@@ -82,7 +82,7 @@ class ImportServiceTest extends TestCase
         $this->assertSame('chunk1_contentchunk2_content', Storage::get($existingUpload->filepath));
     }
 
-    public function testCreateProcessesOnLastChunk(): void
+    public function test_create_processes_on_last_chunk(): void
     {
         Storage::fake();
         Excel::shouldReceive('import')->once();

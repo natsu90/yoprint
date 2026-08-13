@@ -2,16 +2,16 @@
 
 namespace Tests\Feature\Services;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Contracts\ImportServiceInterface;
-use App\Models\Upload;
-use App\Models\Product;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Event;
 use App\Events\UploadUpdated;
+use App\Models\Product;
+use App\Models\Upload;
+use App\Services\ExcelImportService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
 
-class ImportServiceTest extends TestCase
+class ExcelImportServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -41,21 +41,21 @@ class ImportServiceTest extends TestCase
     const PRODUCT_TOTAL_TEST = 17;
 
     /**
-     * @var ImportServiceInterface
+     * @var ExcelImportService
      */
     private $service;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->service = $this->app->make(ImportServiceInterface::class);
+        $this->service = $this->app->make(ExcelImportService::class);
 
         // https://github.com/laravel/framework/issues/18923#issuecomment-1470106626
         Event::fake(UploadUpdated::class);
     }
 
-    public function testProcess()
+    public function test_process()
     {
         // create an Upload record
         $upload = Upload::factory()->create();
@@ -64,7 +64,7 @@ class ImportServiceTest extends TestCase
         $this->assertEquals($upload->status, Upload::STATUS_UPLOADING);
 
         $this->assertDatabaseMissing(Product::getTableName(), [
-            'id' => self::PRODUCT_ID_TEST
+            'id' => self::PRODUCT_ID_TEST,
         ]);
 
         // put file content
@@ -79,29 +79,29 @@ class ImportServiceTest extends TestCase
 
         $this->assertDatabaseHas(Upload::getTableName(), [
             'id' => $upload->getKey(),
-            'status' => Upload::STATUS_COMPLETED
+            'status' => Upload::STATUS_COMPLETED,
         ]);
 
         $this->assertDatabaseHas(Product::getTableName(), [
             'id' => self::PRODUCT_ID_TEST,
             'color' => self::PRODUCT_COLOR_TEST,
-            'style' => self::PRODUCT_STYLE_TEST
+            'style' => self::PRODUCT_STYLE_TEST,
         ]);
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload) {
-            return $event->upload->id === $upload->id  
+            return $event->upload->id === $upload->id
                 && $event->upload->processed > 0
                 && $event->upload->status === Upload::STATUS_PROCESSING;
         });
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload) {
-            return $event->upload->id === $upload->id  
+            return $event->upload->id === $upload->id
                 && $event->upload->processed === 0
                 && $event->upload->status === Upload::STATUS_PROCESSING;
         });
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload) {
-            return $event->upload->id === $upload->id 
+            return $event->upload->id === $upload->id
                 && $event->upload->processed === self::PRODUCT_TOTAL_TEST
                 && $event->upload->status === Upload::STATUS_COMPLETED;
         });
@@ -111,7 +111,7 @@ class ImportServiceTest extends TestCase
         Storage::assertMissing($filePath);
     }
 
-    public function testProcessImportFile()
+    public function test_process_import_file()
     {
         $upload = Upload::factory()->create();
 
@@ -147,7 +147,7 @@ class ImportServiceTest extends TestCase
         Storage::assertMissing($filePath);
     }
 
-    public function testProcessDuplicate()
+    public function test_process_duplicate()
     {
         // create two Upload records
         $upload1 = Upload::factory()->create();
@@ -159,7 +159,7 @@ class ImportServiceTest extends TestCase
         Storage::put($filePath1, $content1);
 
         $newTitle = md5(time());
-        $content2 = "UNIQUE_KEY,PRODUCT_TITLE\n". self::PRODUCT_ID_TEST .",". $newTitle;
+        $content2 = "UNIQUE_KEY,PRODUCT_TITLE\n".self::PRODUCT_ID_TEST.','.$newTitle;
         $filePath2 = $upload2->filepath;
         Storage::put($filePath2, $content2);
 
@@ -175,50 +175,50 @@ class ImportServiceTest extends TestCase
             'id' => self::PRODUCT_ID_TEST,
             'title' => $newTitle,
             'color' => self::PRODUCT_COLOR_TEST,
-            'style' => self::PRODUCT_STYLE_TEST
+            'style' => self::PRODUCT_STYLE_TEST,
         ]);
 
         $this->assertDatabaseHas(Upload::getTableName(), [
             'id' => $upload1->getKey(),
-            'status' => Upload::STATUS_COMPLETED
+            'status' => Upload::STATUS_COMPLETED,
         ]);
         $this->assertDatabaseHas(Upload::getTableName(), [
             'id' => $upload2->getKey(),
-            'status' => Upload::STATUS_COMPLETED
+            'status' => Upload::STATUS_COMPLETED,
         ]);
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload1) {
-            return $event->upload->id === $upload1->id 
+            return $event->upload->id === $upload1->id
                 && $event->upload->status === Upload::STATUS_PROCESSING
                 && $event->upload->processed === 0;
         });
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload1) {
-            return $event->upload->id === $upload1->id 
+            return $event->upload->id === $upload1->id
                 && $event->upload->status === Upload::STATUS_PROCESSING
                 && $event->upload->processed > 0;
         });
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload1) {
-            return $event->upload->id === $upload1->id 
+            return $event->upload->id === $upload1->id
                 && $event->upload->status === Upload::STATUS_COMPLETED;
         });
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload2) {
-            return $event->upload->id === $upload2->id 
+            return $event->upload->id === $upload2->id
                 && $event->upload->status === Upload::STATUS_PROCESSING
                 && $event->upload->processed === 0;
         });
 
         // no idea why this is not called
         // Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload2) {
-        //     return $event->upload->id === $upload2->id 
+        //     return $event->upload->id === $upload2->id
         //         && $event->upload->status === Upload::STATUS_PROCESSING
         //         && $event->upload->processed > 0;
         // });
 
         Event::assertDispatched(UploadUpdated::class, function ($event) use ($upload2) {
-            return $event->upload->id === $upload2->id 
+            return $event->upload->id === $upload2->id
                 && $event->upload->status === Upload::STATUS_COMPLETED;
         });
 
