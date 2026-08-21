@@ -59,7 +59,8 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php -r \"require 'vendor/autoload.php'; Saturio\\DuckDB\\CLib\\Installer::install();\""
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
@@ -88,7 +89,7 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true,
-            "satur.io/duckdb-auto": true
+            "satur.io/duckdb-auto": false
         }
     },
     "minimum-stability": "stable",
