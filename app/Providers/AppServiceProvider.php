@@ -17,11 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $libraryPath = config('imports.library_path');
-
-        if ($libraryPath && ! defined('DUCKDB_PHP_PATH')) {
-            define('DUCKDB_PHP_PATH', $libraryPath);
-        }
+        //
     }
 
     /**

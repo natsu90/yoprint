@@ -12,11 +12,6 @@ on:
 permissions:
   contents: read
 
-env:
-  DUCKDB_VERSION: '1.5.1'
-  DUCKDB_PHP_VERSION: 'v2.1.0'
-  DUCKDB_PHP_PATH: '/opt/duckdb'
-
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -52,14 +47,6 @@ jobs:
           extensions: mbstring, xml, ctype, json, bcmath, pdo_mysql, redis, zip, pcntl, gd, ffi
           ini-values: ffi.enable=true
           coverage: none
-
-      - name: Install DuckDB C library
-        run: |
-          sudo mkdir -p "$DUCKDB_PHP_PATH"
-          curl -fsSL -o /tmp/libduckdb.zip "https://github.com/duckdb/duckdb/releases/download/v${DUCKDB_VERSION}/libduckdb-linux-amd64.zip"
-          sudo unzip -oj /tmp/libduckdb.zip libduckdb.so -d "$DUCKDB_PHP_PATH"
-          curl -fsSL -o /tmp/duckdb-ffi.h "https://raw.githubusercontent.com/satur-io/duckdb-php/${DUCKDB_PHP_VERSION}/header/linux-amd64/duckdb-ffi.h"
-          sudo mv /tmp/duckdb-ffi.h "$DUCKDB_PHP_PATH/duckdb-ffi.h"
 
       - name: Copy environment file
         run: cp .env.example .env

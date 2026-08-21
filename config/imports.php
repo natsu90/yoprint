@@ -23,18 +23,4 @@ return [
         'duckdb' => DuckDbImportService::class,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | DuckDB Library Path
-    |--------------------------------------------------------------------------
-    |
-    | Directory holding libduckdb and its FFI header. AppServiceProvider defines
-    | it as the DUCKDB_PHP_PATH constant the library looks for, because relying
-    | on the environment variable alone does not survive `artisan serve`, which
-    | only passes an allow list of variables to its workers.
-    |
-    */
-
-    'library_path' => env('DUCKDB_PHP_PATH', '/opt/duckdb'),
-
 ];
